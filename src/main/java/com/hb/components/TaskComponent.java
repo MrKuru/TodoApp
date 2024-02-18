@@ -4,9 +4,12 @@ package com.hb.components;
 import com.hb.dto.requests.CreateTaskRequest;
 import com.hb.dto.responses.TaskViewResponse;
 import com.hb.exception.exceptions.TaskNotFoundException;
+import com.hb.exception.exceptions.TodoNotFoundException;
 import com.hb.mappers.TaskMapper;
 import com.hb.model.documents.Task;
+import com.hb.model.documents.Todo;
 import com.hb.model.repositories.TaskRepository;
+import com.hb.model.repositories.TodoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +21,12 @@ import java.util.Optional;
 public class TaskComponent {
     private final TaskRepository repository;
     private final TaskMapper mapper;
+    private final TodoRepository todoRepository;
     public TaskViewResponse createTask(CreateTaskRequest request) {
+        Optional<Todo> optionalTodo = todoRepository.findById(request.getTodoId());
+        if (optionalTodo.isEmpty()){
+            throw new TodoNotFoundException("Todo not found with id: "+ request.getTodoId());
+        }
         Task task = Task.builder()
                 .id(request.getId())
                 .title(request.getTitle())

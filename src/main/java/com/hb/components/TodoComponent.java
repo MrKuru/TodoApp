@@ -3,11 +3,14 @@ package com.hb.components;
 
 import com.hb.dto.requests.CreateTodoRequest;
 import com.hb.dto.responses.TodoViewResponse;
+import com.hb.exception.exceptions.AccountNotFoundException;
 import com.hb.exception.exceptions.TodoNotFoundException;
 import com.hb.exception.exceptions.TodoWithTaskException;
 import com.hb.mappers.TodoMapper;
+import com.hb.model.documents.Account;
 import com.hb.model.documents.Task;
 import com.hb.model.documents.Todo;
+import com.hb.model.repositories.AccountRepository;
 import com.hb.model.repositories.TaskRepository;
 import com.hb.model.repositories.TodoRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +24,13 @@ import java.util.Optional;
 public class TodoComponent {
     private final TaskRepository taskRepository;
     private final TodoRepository repository;
+    private final AccountRepository accountRepository;
     private final TodoMapper mapper;
     public TodoViewResponse createTodo(CreateTodoRequest request) {
+        Optional<Account> optionalAccount = accountRepository.findById(request.getAccountId());
+        if (optionalAccount.isEmpty()){
+            throw new AccountNotFoundException("Account not found with id: "+ request.getAccountId());
+        }
         Todo todo = Todo.builder()
                 .id(request.getId())
                 .listName(request.getListName())

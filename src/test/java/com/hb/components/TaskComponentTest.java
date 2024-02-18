@@ -3,9 +3,12 @@ package com.hb.components;
 import com.hb.dto.requests.CreateTaskRequest;
 import com.hb.dto.responses.TaskViewResponse;
 import com.hb.exception.exceptions.TaskNotFoundException;
+import com.hb.exception.exceptions.TodoNotFoundException;
 import com.hb.mappers.TaskMapper;
 import com.hb.model.documents.Task;
+import com.hb.model.documents.Todo;
 import com.hb.model.repositories.TaskRepository;
+import com.hb.model.repositories.TodoRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,20 +34,34 @@ class TaskComponentTest {
     @Mock
     private TaskMapper mockTaskMapper;
 
+    @Mock
+    private TodoRepository mockTodoRepository;
+
     @InjectMocks
     private TaskComponent mockTaskComponent;
 
     @Test
     void createTask_Success() {
         CreateTaskRequest request = new CreateTaskRequest(1L,"Title", "Description", 1L);
+        when(mockTodoRepository.findById(1L)).thenReturn(Optional.of(new Todo()));
         when(mockTaskRepository.save(any(Task.class))).thenReturn(new Task());
         when(mockTaskMapper.toView(any(Task.class))).thenReturn(new TaskViewResponse());
 
         TaskViewResponse response = mockTaskComponent.createTask(request);
 
+        verify(mockTodoRepository).findById(1L);
         verify(mockTaskRepository).save(any(Task.class));
         verify(mockTaskMapper).toView(any(Task.class));
         assertThat(response).isNotNull();
+    }
+
+    @Test
+    void createTask_TodoNotFoundException() {
+        CreateTaskRequest request = new CreateTaskRequest(2L,"Title", "Description", 2L);
+        when(mockTodoRepository.findById(2L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> mockTaskComponent.createTask(request))
+                .isInstanceOf(TodoNotFoundException.class);
     }
 
     @Test

@@ -2,11 +2,14 @@ package com.hb.components;
 
 import com.hb.dto.requests.CreateTodoRequest;
 import com.hb.dto.responses.TodoViewResponse;
+import com.hb.exception.exceptions.AccountNotFoundException;
 import com.hb.exception.exceptions.TodoNotFoundException;
 import com.hb.exception.exceptions.TodoWithTaskException;
 import com.hb.mappers.TodoMapper;
+import com.hb.model.documents.Account;
 import com.hb.model.documents.Task;
 import com.hb.model.documents.Todo;
+import com.hb.model.repositories.AccountRepository;
 import com.hb.model.repositories.TaskRepository;
 import com.hb.model.repositories.TodoRepository;
 import org.junit.jupiter.api.Test;
@@ -35,6 +38,9 @@ class TodoComponentTest {
     private TodoRepository mockTodoRepository;
 
     @Mock
+    private AccountRepository mockAccountRepository;
+
+    @Mock
     private TodoMapper mockTodoMapper;
 
     @InjectMocks
@@ -43,14 +49,25 @@ class TodoComponentTest {
     @Test
     void createTodo_Success() {
         CreateTodoRequest request = new CreateTodoRequest(1L,"listName", 1L);
+        when(mockAccountRepository.findById(1L)).thenReturn(Optional.of(new Account()));
         when(mockTodoRepository.save(any(Todo.class))).thenReturn(new Todo());
         when(mockTodoMapper.toView(any(Todo.class))).thenReturn(new TodoViewResponse());
 
         TodoViewResponse response = mockTodoComponent.createTodo(request);
 
+        verify(mockAccountRepository).findById(1L);
         verify(mockTodoRepository).save(any(Todo.class));
         verify(mockTodoMapper).toView(any(Todo.class));
         assertThat(response).isNotNull();
+    }
+
+    @Test
+    void createTodo_AccountNotFoundException() {
+        CreateTodoRequest request = new CreateTodoRequest(1L,"listName", 2L);
+        when(mockAccountRepository.findById(2L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> mockTodoComponent.createTodo(request))
+                .isInstanceOf(AccountNotFoundException.class);
     }
 
     @Test
