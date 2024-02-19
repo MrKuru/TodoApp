@@ -1,7 +1,5 @@
 # Todo App
 
-Todo App ile ilgili açıklama yapmak üzere oluşturulmuştur.
-
 ### Başlangıç
 
 Projeyi local ortamda çalıştırmak için aşağıdaki adımları takip edebilirsiniz..
@@ -73,5 +71,3 @@ Projedeki endpointler Basic Authentication ile korunmaktadır. Test için postma
 - Swagger Url : http://localhost:8080/swagger-ui/index.html#/
 - Username : Melih
 - Password : 12345
-
-
