@@ -6,7 +6,7 @@ import org.springframework.data.couchbase.config.AbstractCouchbaseConfiguration;
 import org.springframework.data.couchbase.repository.config.EnableCouchbaseRepositories;
 
 @Configuration
-@EnableCouchbaseRepositories(basePackages = "com.hb.dao.repositories")
+@EnableCouchbaseRepositories(basePackages = "com.hb.model.repositories")
 public class CouchbaseConfiguration extends AbstractCouchbaseConfiguration {
 
     @Value("${spring.couchbase.bootstrap-hosts}")
